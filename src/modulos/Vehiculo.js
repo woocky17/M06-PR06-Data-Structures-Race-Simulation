@@ -1,15 +1,65 @@
-export class Vehiculo {
+export let vehiculos = [];
+
+export function getVehiculos() {
+  return vehiculos;
+}
+
+export function setVehiculos(nuevosVehiculos) {
+  if (!Array.isArray(nuevosVehiculos)) {
+    throw new Error("El argumento debe ser un array de vehículos.");
+  }
+  vehiculos = nuevosVehiculos.map((vehiculo) => {
+    if (!vehiculo.modelo || !vehiculo.traccion) {
+      throw new Error("Cada vehículo debe tener un modelo y una tracción.");
+    }
+    return vehiculo;
+  });
+}
+
+class Vehiculo {
   constructor(modelo, traccion, avanceMax, avanceMin) {
-    this.modelo = modelo;
-    this.avanceMax = avanceMax;
-    this.avanceMin = avanceMin;
-    this.traccion = traccion;
+    this._modelo = modelo;
+    this._traccion = traccion;
+    this._avanceMax = avanceMax;
+    this._avanceMin = avanceMin;
+  }
+
+  get modelo() {
+    return this._modelo;
+  }
+
+  set modelo(value) {
+    this._modelo = value;
+  }
+
+  get avanceMax() {
+    return this._avanceMax;
+  }
+
+  set avanceMax(value) {
+    this._avanceMax = value;
+  }
+
+  get avanceMin() {
+    return this._avanceMin;
+  }
+
+  set avanceMin(value) {
+    this._avanceMin = value;
+  }
+
+  get traccion() {
+    return this._traccion;
+  }
+
+  set traccion(value) {
+    this._traccion = value;
   }
 
   movimiento() {
     return (
-      Math.floor(Math.random() * (this.avanceMax - this.avanceMin + 1)) +
-      this.avanceMin
+      Math.floor(Math.random() * (this._avanceMax - this._avanceMin + 1)) +
+      this._avanceMin
     );
   }
 }
@@ -17,22 +67,54 @@ export class Vehiculo {
 export class Moto extends Vehiculo {
   constructor(modelo, traccion, avanceMax, avanceMin) {
     super(modelo, traccion, avanceMax, avanceMin);
+    this.caida = 0;
   }
-  movimiento() {
+
+  movimiento(clima) {
+    if (this.caida > 0) {
+      this.caida--;
+      return 0;
+    }
+
     let movimiento = super.movimiento();
     console.log(movimiento + ": velocidad base");
 
     switch (this.traccion) {
       case "dura":
-        return movimiento + 5;
+        movimiento += 5;
+        break;
       case "mediana":
-        return movimiento + 2;
-
-      default:
-        return movimiento;
+        movimiento += 2;
+        break;
     }
+
+    if (this.verificarCaida(clima)) {
+      this.caida = 5;
+      return 0;
+    }
+
+    return movimiento;
+  }
+
+  verificarCaida(clima) {
+    let probabilidad = 0;
+    if (clima === "lluvioso" && this.traccion === "dura") {
+      probabilidad = 30;
+    } else if (
+      (clima === "húmedo" && this.traccion === "dura") ||
+      (clima === "lluvioso" && this.traccion === "mediana")
+    ) {
+      probabilidad = 20;
+    } else if (clima === "húmedo" && this.traccion === "mediana") {
+      probabilidad = 10;
+    } else {
+      probabilidad = 5;
+    }
+
+    return Math.random() * 100 < probabilidad;
   }
 }
+
 export class Coche extends Vehiculo {
   constructor(modelo, traccion, avanceMax, avanceMin) {
     super(modelo, traccion, avanceMax, avanceMin);
