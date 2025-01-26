@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Moto, Coche, getVehiculos, setVehiculos } from "../modulos/Vehiculo";
+import { Moto, Coche, vehiculos } from "../modules/Vehiculo";
 
 const CreateVehiculos = () => {
   const [modelo, setModelo] = useState("");
@@ -7,29 +7,21 @@ const CreateVehiculos = () => {
   const [avanceMax, setAvanceMax] = useState(10);
   const [avanceMin, setAvanceMin] = useState(5);
   const [tipoVehiculo, setTipoVehiculo] = useState("Moto");
-  const [mensaje, setMensaje] = useState("");
 
   const crearVehiculo = () => {
-    if (modelo.trim() === "") {
-      setMensaje("El modelo es obligatorio.");
-      return;
-    }
-
     let nuevoVehiculo;
+    if (tipoVehiculo === "Moto") {
+      nuevoVehiculo = new Moto(modelo, traccion, avanceMax, avanceMin);
+    } else if (tipoVehiculo === "Coche") {
+      nuevoVehiculo = new Coche(modelo, traccion, avanceMax, avanceMin);
+    }
     try {
-      if (tipoVehiculo === "Moto") {
-        nuevoVehiculo = new Moto(modelo, traccion, avanceMax, avanceMin);
-      } else if (tipoVehiculo === "Coche") {
-        nuevoVehiculo = new Coche(modelo, traccion, avanceMax, avanceMin);
-      }
-      const nuevosVehiculos = [...getVehiculos(), nuevoVehiculo];
-      setVehiculos(nuevosVehiculos);
-      setMensaje(`Vehículo ${modelo} creado con éxito.`);
+      vehiculos.push(nuevoVehiculo);
+      console.log(`Vehículo ${modelo} creado con éxito.`);
     } catch (error) {
-      setMensaje(error.message);
+      console.error("Error al crear el vehículo:", error.message);
     }
   };
-
   return (
     <div>
       <h2>Crear Vehículo</h2>
@@ -64,7 +56,6 @@ const CreateVehiculos = () => {
         <option value="Coche">Coche</option>
       </select>
       <button onClick={crearVehiculo}>Crear Vehículo</button>
-      {mensaje && <p>{mensaje}</p>}
     </div>
   );
 };

@@ -1,16 +1,29 @@
-import { Flex } from "@radix-ui/themes";
 import { MdHome } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
 
 const NavBar = () => {
   return (
-    <Flex justify="between" gap="3" align="center" direction="row">
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 50,
+      }}
+    >
       <div>
         <Link to="/">
           <MdHome size={24} color="#000" />
         </Link>
       </div>
-      <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
+      <ul
+        style={{
+          display: "flex",
+          gap: 50,
+          listStyleType: "none",
+          padding: 0,
+          margin: 0,
+        }}
+      >
         <li>
           <NavLink
             to="/Crear-Circuito"
@@ -45,7 +58,7 @@ const NavBar = () => {
           </NavLink>
         </li>
       </ul>
-    </Flex>
+    </div>
   );
 };
 

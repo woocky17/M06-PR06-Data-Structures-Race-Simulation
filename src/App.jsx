@@ -1,41 +1,103 @@
 import "./App.css";
-import { getCircuitos } from "./modulos/Circuito";
-import NavBar from "./componentes/NavBar";
+import "./index.css";
+import { useState } from "react";
+
+import NavBar from "./components/NavBar";
 import { Routes, Route } from "react-router-dom";
 import CreateCircuito from "./components/CreateCircuito";
 import CreateParticipantes from "./components/CreateParticipantes";
 import CreateVehiculos from "./components/CreateVehiculos";
-import "./index.css";
+import { circuitos } from "./modules/Circuito";
+import { iniciarCarrera } from "./controller/controller";
 
 function App() {
-  const iniciarCarrera = () => {
-    const circuitos = getCircuitos();
-    if (circuitos.length > 0) {
-      const circuito = circuitos[0];
-      if (typeof circuito.simularCarrera === "function") {
-        circuito.simularCarrera();
-      } else {
-        console.error(
-          "El método simularCarrera no está definido en el circuito."
-        );
-      }
-    } else {
-      console.error("No hay circuitos disponibles.");
+  const [circuitoSeleccionado, setCircuitoSeleccionado] = useState("");
+  const [estadoCarrera, setEstadoCarrera] = useState([]);
+  const [resultados, setResultados] = useState([]);
+
+  function handleIniciarCarrera() {
+    if (!circuitoSeleccionado) {
+      console.error(
+        "Por favor selecciona un circuito antes de iniciar la carrera."
+      );
+      return;
     }
-  };
+
+    const circuito = circuitos.find((c) => c.nombre === circuitoSeleccionado);
+    if (!circuito) {
+      console.error("Circuito no encontrado.");
+      return;
+    }
+
+    try {
+      iniciarCarrera(
+        circuitoSeleccionado,
+        (estadoActualizado) => {
+          // Actualizar estado en tiempo real
+          setEstadoCarrera(estadoActualizado);
+        },
+        (resultadosFinales) => {
+          // Mostrar resultados finales
+          setResultados(resultadosFinales);
+        }
+      );
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
 
   return (
     <>
       <NavBar />
-      <Routes>
-        <Route
-          path="/"
-          element={<button onClick={iniciarCarrera}>Iniciar Carrera</button>}
-        />
-        <Route path="/Crear-Circuito" element={<CreateCircuito />} />
-        <Route path="/Crear-Participantes" element={<CreateParticipantes />} />
-        <Route path="/Crear-Vehiculos" element={<CreateVehiculos />} />
-      </Routes>
+      <div
+        style={{
+          marginTop: 50,
+        }}
+      >
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <div style={{ marginBottom: "20px" }}>
+                  <label htmlFor="circuito-select">
+                    Selecciona un circuito:
+                  </label>
+                  <select
+                    id="circuito-select"
+                    value={circuitoSeleccionado}
+                    onChange={(e) => setCircuitoSeleccionado(e.target.value)}
+                    style={{ marginLeft: "10px" }}
+                  >
+                    <option value=""> Selecciona un circuito </option>
+                    {circuitos.map((circuito, index) => (
+                      <option key={index} value={circuito.nombre}>
+                        {circuito.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button onClick={handleIniciarCarrera}>Iniciar Carrera</button>
+                <div>
+                  <h3>Estado de la carrera:</h3>
+                  <pre>{JSON.stringify(estadoCarrera, null, 2)}</pre>
+                </div>
+                <div>
+                  <h3>Resultados finales:</h3>
+                  <pre>{JSON.stringify(resultados, null, 2)}</pre>
+                </div>
+              </>
+            }
+          />
+
+          <Route path="/Crear-Circuito" element={<CreateCircuito />} />
+          <Route
+            path="/Crear-Participantes"
+            element={<CreateParticipantes />}
+          />
+          <Route path="/Crear-Vehiculos" element={<CreateVehiculos />} />
+        </Routes>
+      </div>
     </>
   );
 }

@@ -1,65 +1,15 @@
-export let vehiculos = [];
-
-export function getVehiculos() {
-  return vehiculos;
-}
-
-export function setVehiculos(nuevosVehiculos) {
-  if (!Array.isArray(nuevosVehiculos)) {
-    throw new Error("El argumento debe ser un array de vehículos.");
-  }
-  vehiculos = nuevosVehiculos.map((vehiculo) => {
-    if (!vehiculo.modelo || !vehiculo.traccion) {
-      throw new Error("Cada vehículo debe tener un modelo y una tracción.");
-    }
-    return vehiculo;
-  });
-}
-
 class Vehiculo {
   constructor(modelo, traccion, avanceMax, avanceMin) {
-    this._modelo = modelo;
-    this._traccion = traccion;
-    this._avanceMax = avanceMax;
-    this._avanceMin = avanceMin;
-  }
-
-  get modelo() {
-    return this._modelo;
-  }
-
-  set modelo(value) {
-    this._modelo = value;
-  }
-
-  get avanceMax() {
-    return this._avanceMax;
-  }
-
-  set avanceMax(value) {
-    this._avanceMax = value;
-  }
-
-  get avanceMin() {
-    return this._avanceMin;
-  }
-
-  set avanceMin(value) {
-    this._avanceMin = value;
-  }
-
-  get traccion() {
-    return this._traccion;
-  }
-
-  set traccion(value) {
-    this._traccion = value;
+    this.modelo = modelo;
+    this.traccion = traccion;
+    this.avanceMax = avanceMax;
+    this.avanceMin = avanceMin;
   }
 
   movimiento() {
     return (
-      Math.floor(Math.random() * (this._avanceMax - this._avanceMin + 1)) +
-      this._avanceMin
+      Math.floor(Math.random() * (this.avanceMax - this.avanceMin + 1)) +
+      this.avanceMin
     );
   }
 }
@@ -77,7 +27,6 @@ export class Moto extends Vehiculo {
     }
 
     let movimiento = super.movimiento();
-    console.log(movimiento + ": velocidad base");
 
     switch (this.traccion) {
       case "dura":
@@ -147,3 +96,5 @@ export class Coche extends Vehiculo {
     }
   }
 }
+
+export let vehiculos = [];
